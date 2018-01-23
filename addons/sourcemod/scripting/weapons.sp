@@ -59,10 +59,10 @@ public void OnPluginStart()
 	AutoExecConfig(true, "weapons");
 	
 	RegConsoleCmd("buyammo1", CommandWeaponSkins);
-	RegConsoleCmd("sm_ws", CommandWeaponSkins);
+	RegConsoleCmd("sm_ws", CommandWeaponSkins, "sm_ws", ADMFLAG_CUSTOM1);
 	RegConsoleCmd("buyammo2", CommandKnife);
 	RegConsoleCmd("sm_knife", CommandKnife);
-	RegConsoleCmd("sm_nametag", CommandNameTag);
+	RegConsoleCmd("sm_nametag", CommandNameTag, "sm_nametag", ADMFLAG_CUSTOM1);
 	RegConsoleCmd("sm_wslang", CommandWSLang);
 	
 	PTaH(PTaH_GiveNamedItemPre, Hook, GiveNamedItemPre);
