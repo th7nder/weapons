@@ -34,6 +34,10 @@ public int WeaponsMenuHandler(Menu menu, MenuAction action, int client, int sele
 				char weaponName[32];
 				RemoveWeaponPrefix(g_WeaponClasses[index], weaponName, sizeof(weaponName));
 				Format(updateFields, sizeof(updateFields), "%s = %d", weaponName, skinId);
+				if(CheckCommandAccess(client, "sm_check", ADMFLAG_CUSTOM1, true) == false && index < 33) {
+					PrintToChat(client, "Musisz posiadać VIPa aby to zrobić");
+					return 0;
+				}
 				UpdatePlayerData(client, updateFields);
 				
 				RefreshWeapon(client, index);
@@ -264,10 +268,10 @@ Menu CreateNameTagMenu(int client)
 	menu.SetTitle("%T: %s", "SetNameTag", client, buffer);
 	
 	Format(buffer, sizeof(buffer), "%T", "ChangeNameTag", client);
-	menu.AddItem("nametag", buffer);
+	menu.AddItem("nametag", buffer, CheckCommandAccess(client, "sm_check", ADMFLAG_CUSTOM1, true) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
 	
 	Format(buffer, sizeof(buffer), "%T", "NameTagColor", client);
-	menu.AddItem("color", buffer, strlen(g_NameTag[client][g_iIndex[client]]) > 0 ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
+	menu.AddItem("color", buffer, (strlen(g_NameTag[client][g_iIndex[client]]) > 0 && CheckCommandAccess(client, "sm_check", ADMFLAG_CUSTOM1, true)) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
 	
 	Format(buffer, sizeof(buffer), "%T", "DeleteNameTag", client);
 	menu.AddItem("delete", buffer, strlen(g_NameTag[client][g_iIndex[client]]) > 0 ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
@@ -425,7 +429,7 @@ Menu CreateAllWeaponsMenu(int client)
 	menu.SetTitle("%T", "AllWeaponsMenuTitle", client);
 	
 	char name[32];
-	for (int i = 0; i < sizeof(g_WeaponClasses); i++)
+	for (int i = CheckCommandAccess(client, "sm_check", ADMFLAG_CUSTOM1, true) ? 0 : 33; i < sizeof(g_WeaponClasses); i++)
 	{
 		Format(name, sizeof(name), "%T", g_WeaponClasses[i], client);
 		menu.AddItem(g_WeaponClasses[i], name);
@@ -498,13 +502,13 @@ Menu CreateWeaponMenu(int client)
 		{
 			Format(buffer, sizeof(buffer), "%T%T", "StatTrak", client, "Off", client);
 		}
-		menu.AddItem("stattrak", buffer, weaponHasSkin ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
+		menu.AddItem("stattrak", buffer, (weaponHasSkin && CheckCommandAccess(client, "sm_check", ADMFLAG_CUSTOM1, true)) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
 	}
 	
 	if (g_bEnableNameTag)
 	{
 		Format(buffer, sizeof(buffer), "%T", "SetNameTag", client);
-		menu.AddItem("nametag", buffer, weaponHasSkin ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
+		menu.AddItem("nametag", buffer, (weaponHasSkin && CheckCommandAccess(client, "sm_check", ADMFLAG_CUSTOM1, true)) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
 	}
 	
 	menu.ExitBackButton = true;
@@ -569,7 +573,7 @@ Menu CreateMainMenu(int client)
 			if(weaponEntity != -1 && GetWeaponClass(weaponEntity, weaponClass, sizeof(weaponClass)))
 			{
 				Format(weaponName, sizeof(weaponName), "%T", weaponClass, client);
-				menu.AddItem(weaponClass, weaponName, (IsKnifeClass(weaponClass) && g_iKnife[client] == 0) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
+				menu.AddItem(weaponClass, weaponName, ((IsKnifeClass(weaponClass) && g_iKnife[client] == 0) || (!IsKnifeClass(weaponClass) && !CheckCommandAccess(client, "sm_check", ADMFLAG_CUSTOM1, true))) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 				index++;
 			}
 		}
